@@ -8,5 +8,13 @@
 ## ŘEŠENÍ
 
 ### Volba tématu
+10: Distribuce tisku
+Vaše SW firma dostala zakázku na systém “Doručování periodického tisku”. Tento informační
+systém musí být schopen evidovat zákazníky a jimi odebírané noviny a časopisy, připravovat
+účty a evidovat platby, evidovat termíny, kdy zákazník dočasně neodebírá tiskoviny (např. po
+dobu dovolené ) a pro každého doručovatele připravit vhodně uspořádaný denní seznam
+doručovaných tiskovin.
 
+### Odkaz na diagramy
+https://lucid.app/lucidchart/eccb8c76-6c95-4e11-8ad8-997906879d07/edit?viewport_loc=-1610%2C-903%2C1365%2C613%2C0_0&invitationId=inv_14073941-f14f-4d7c-8fd0-0b0fd6c91fea 
 
