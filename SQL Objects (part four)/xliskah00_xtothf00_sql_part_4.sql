@@ -400,7 +400,92 @@ INSERT INTO Seznam_Tiskovina (
 ) VALUES (
     3, 3, 300
 );
+-- Index na zakaznik_tiskovina & EXPLAIN PLAN před/po indexu
 
+--  Explain plan pred indexom
+    EXPLAIN PLAN FOR
+    SELECT *
+    FROM Zakaznik z
+    JOIN Zakaznik_Tiskovina zt 
+    ON z.cislo_uctu = zt.zakaznik_cislo_uctu AND z.id = zt.zakaznik_ID
+    JOIN Tiskovina t 
+    ON t.kod_tiskoviny = zt.kod_tiskoviny;
+
+-- Zobrazenie plánu pred indexáciu
+    SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Indexácia
+    CREATE INDEX idx_zt_kt ON Zakaznik_Tiskovina(kod_tiskoviny);
+
+-- Explain plan po indexe
+    EXPLAIN PLAN FOR
+    SELECT *
+    FROM Zakaznik z
+    JOIN Zakaznik_Tiskovina zt 
+    ON z.cislo_uctu = zt.zakaznik_cislo_uctu AND z.id = zt.zakaznik_ID
+    JOIN Tiskovina t 
+    ON t.kod_tiskoviny = zt.kod_tiskoviny;
+-- Zobrazenie po indexácii
+    SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Další EXPLAIN PLAN + GROUP BY
+    -- Dotaz – počet predplatiteľov na každú tiskovinu
+    EXPLAIN PLAN FOR
+    SELECT 
+        t.nazev,
+        COUNT(DISTINCT zt.zakaznik_ID) AS pocet_predplatitelu
+    FROM 
+        Tiskovina t
+    JOIN 
+        Zakaznik_Tiskovina zt ON t.kod_tiskoviny = zt.kod_tiskoviny
+    GROUP BY 
+        t.nazev;
+
+    -- zobrazenie pred optimalizáciou
+    SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+    -- Optimalizácia pomocou kombinovaného indexu -> zrychluje join a count(DISTINCT)
+    CREATE INDEX idx_zt_kt_id ON Zakaznik_Tiskovina(kod_tiskoviny, zakaznik_ID);
+
+    EXPLAIN PLAN FOR
+    SELECT 
+        t.nazev,
+        COUNT(DISTINCT zt.zakaznik_ID) AS pocet_predplatitelu
+    FROM 
+        Tiskovina t
+    JOIN 
+        Zakaznik_Tiskovina zt ON t.kod_tiskoviny = zt.kod_tiskoviny
+    GROUP BY 
+        t.nazev;
+
+    -- Zobrazenie po optimalizácii
+    SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+-- Vytvorenie 2. uzivatela v databaze
+    CREATE USER kolega IDENTIFIED BY kolega123;
+    -- zakladne prava
+    GRANT CONNECT TO kolega;
+    GRANT CREATE SESSION TO kolega;
+    -- pristupove prava
+    GRANT SELECT, INSERT ON Zakaznik TO kolega;
+    GRANT SELECT, INSERT ON Tiskovina TO kolega;
+    GRANT SELECT, INSERT ON Zakaznik_Tiskovina TO kolega;
+    GRANT SELECT ON Platba TO kolega;
+
+    -- Materializovaný prehľad nad vopred špecifikovanými datami, kolega nemá práva k vytváraniu nových
+    CREATE MATERIALIZED VIEW kolega.v_prehled_platby AS
+    SELECT 
+        zt.zakaznik_ID,
+        zt.kod_tiskoviny,
+        t.nazev,
+        zt.platba
+    FROM 
+        Zakaznik_Tiskovina zt
+    JOIN 
+        Tiskovina t ON zt.kod_tiskoviny = t.kod_tiskoviny;
+
+    -- select checking
+    SELECT * FROM kolega.v_prehled_platby;
 -- Dotazy
 
 -- Zobrazí všetchny platby uskutečněné zákazníky
