@@ -101,3 +101,22 @@ Visual Paradigm, Community Edition
 Obeo UML Designer (Eclipse)
 Modeliosoft Modelio
 PlantUML
+
+# Hodnocení
+
+### 1. část 
+Tiskovina by mela mit vice Plateb.
+V seznamu nemuze byt jedna Tiskovina vicekrat (vice kusu); celkovyPocet moc nedava smysl; potrebneTiskoviny zbytecne pri vztahu.
+Weak entite chybi identifikujici vazba a nemela by mit PK.
+3/5
+
+### 2. část 
+Chybne poradi vytvareni tabulek, napr. Seznam potrebuje Dorucovatel, ktery zatim neni.
+4/5
+
+### 3. část
+5/5
+
+### 4. část 
+nevysvetlen expl pl; nevysvetleno nvl v jedne proc
+14/19
